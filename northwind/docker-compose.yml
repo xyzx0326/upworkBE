@@ -1,0 +1,39 @@
+version: '3'
+services:
+  db:
+    image: 'postgres:latest'
+    restart: always
+    # cf. https://devcenter.heroku.com/articles/heroku-postgresql#version-support
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: ses
+    # The following is UNNEEDED for the app service to access the db.
+    # Enable it ONLY IF YOU NEED TO ALSO ACCESS THE DB FROM THE HOST.
+    ports:
+      - '5432:5432'
+    expose:
+      - 5432
+    networks:
+      - db-net
+    # The volume is useful to locally test the webapp data persistence,
+    # after running "docker-compose down && docker-compose up --build".
+    volumes:
+      - postgres-data-dev:/var/lib/postgresql/data
+  app:
+    build: .
+    # image: name-of-your-app  # optional
+    environment:
+      SPRING_DATASOURCE_URL: 'jdbc:postgresql://db:5432/ses'
+    ports:
+      - '8080:8080'
+    networks:
+      - db-net
+    depends_on:
+      - db
+networks:
+  db-net:
+    driver: bridge
+volumes:
+  postgres-data-dev:
+    driver: local
