@@ -27,17 +27,6 @@ public class SpeechRecognitionService {
         Response response = client.newCall(request).execute();
         response.close();
 
-//        Unirest.setTimeouts(0, 0);
-//        try {
-//            HttpResponse<String> response = Unirest.post("http://192.168.1.50:9080/initialize_model")
-//                    .header("accept", "application/json")
-//                    .header("Content-Type", "application/x-www-form-urlencoded")
-//                    .field("model", "Conformer-CTC-BPE.nemo")
-//                    .asString();
-//        } catch (UnirestException e) {
-//            throw new RuntimeException(e);
-//        }
-
     }
     public void initAll() throws IOException {
 

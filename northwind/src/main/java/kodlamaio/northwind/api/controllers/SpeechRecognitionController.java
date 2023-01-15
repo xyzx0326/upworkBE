@@ -1,8 +1,13 @@
 package kodlamaio.northwind.api.controllers;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kodlamaio.northwind.core.utilities.responses.RecognitionMessage;
 import kodlamaio.northwind.core.utilities.responses.RecognizedSpeechResponse;
 import kodlamaio.northwind.services.SpeechRecognitionService;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,8 +41,8 @@ public class SpeechRecognitionController {
         this.speechRecognitionService = speechRecognitionService;
     }
 
-//    @Autowired
-//    private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @PostMapping("/savefile")
     public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
@@ -132,54 +137,54 @@ public class SpeechRecognitionController {
         }
     }
 //}
-//    @PostMapping("/recognizequeue")
-//    public ResponseEntity<String> speech_recognize2(MultipartFile file, String language) {
-////        String message;
-//        File tempFile = null;
-//        try {
-//            String ofn = file.getOriginalFilename();
-//
-//            tempFile = File.createTempFile(ofn, ".wav");
-//            file.transferTo(tempFile);
-//
-//            RecognitionMessage recognitionMessage = new RecognitionMessage();
-//            recognitionMessage.setFilepath(tempFile.getAbsolutePath());
-//            recognitionMessage.setLanguage(language);
-//
-//            // Convert RecognitionMessage object to JSON and send to "speech-recognition-queue"
-//            ObjectMapper mapper = new ObjectMapper();
-//            String json = mapper.writeValueAsString(recognitionMessage);
-//
-//            MessageProperties messageProperties = new MessageProperties();
-//            messageProperties.setContentType(MessageProperties.CONTENT_TYPE_JSON);
-//            Message message = new Message(json.getBytes(), messageProperties);
-//
-//            rabbitTemplate.send("speech-recognition-exchange", "speech-recognition-routing-key", message);
-//
-////            String recognizedOutputJsonOpt = (String) rabbitTemplate.receiveAndConvert("speech-recognition-queue");
-////            // Create response object
-////            RecognizedSpeechResponse response = new RecognizedSpeechResponse(true, recognizedOutputJsonOpt);
-////            response.setRecognizedText(recognizedOutputJsonOpt);
-//            return ResponseEntity.status(HttpStatus.OK).body("recognizedOutputJsonOpt");
-//
-//        } catch (IOException e) {
-////            message = "Failed to upload!";
-//            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body( "Failed to upload!");
-//        } finally {
-//            // Delete the temporary file
-//            tempFile.delete();
-//        }
-//    }
-//
-//    @PostMapping("/getResponse")
-//    public ResponseEntity<String> getResp() {
-//        byte[] messageBytes = (byte[]) rabbitTemplate.receiveAndConvert("recognized-text-queue");
-//        String recognizedOutputJsonOpt = new String(messageBytes);
-//        // Create response object
-//        RecognizedSpeechResponse response = new RecognizedSpeechResponse(true, recognizedOutputJsonOpt);
-//        response.setRecognizedText(recognizedOutputJsonOpt);
-//        return ResponseEntity.status(HttpStatus.OK).body(recognizedOutputJsonOpt);
-//    }
+    @PostMapping("/recognizequeue")
+    public ResponseEntity<String> speech_recognize2(MultipartFile file, String language) {
+//        String message;
+        File tempFile = null;
+        try {
+            String ofn = file.getOriginalFilename();
+
+            tempFile = File.createTempFile(ofn, ".wav");
+            file.transferTo(tempFile);
+
+            RecognitionMessage recognitionMessage = new RecognitionMessage();
+            recognitionMessage.setFilepath(tempFile.getAbsolutePath());
+            recognitionMessage.setLanguage(language);
+
+            // Convert RecognitionMessage object to JSON and send to "speech-recognition-queue"
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(recognitionMessage);
+
+            MessageProperties messageProperties = new MessageProperties();
+            messageProperties.setContentType(MessageProperties.CONTENT_TYPE_JSON);
+            Message message = new Message(json.getBytes(), messageProperties);
+
+            rabbitTemplate.send("speech-recognition-exchange", "speech-recognition-routing-key", message);
+
+//            String recognizedOutputJsonOpt = (String) rabbitTemplate.receiveAndConvert("speech-recognition-queue");
+//            // Create response object
+//            RecognizedSpeechResponse response = new RecognizedSpeechResponse(true, recognizedOutputJsonOpt);
+//            response.setRecognizedText(recognizedOutputJsonOpt);
+            return ResponseEntity.status(HttpStatus.OK).body("recognizedOutputJsonOpt");
+
+        } catch (IOException e) {
+//            message = "Failed to upload!";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body( "Failed to upload!");
+        } finally {
+            // Delete the temporary file
+            tempFile.delete();
+        }
+    }
+
+    @PostMapping("/getResponse")
+    public ResponseEntity<String> getResp() {
+        byte[] messageBytes = (byte[]) rabbitTemplate.receiveAndConvert("recognized-text-queue");
+        String recognizedOutputJsonOpt = new String(messageBytes);
+        // Create response object
+        RecognizedSpeechResponse response = new RecognizedSpeechResponse(true, recognizedOutputJsonOpt);
+        response.setRecognizedText(recognizedOutputJsonOpt);
+        return ResponseEntity.status(HttpStatus.OK).body(recognizedOutputJsonOpt);
+    }
 }
 
 
