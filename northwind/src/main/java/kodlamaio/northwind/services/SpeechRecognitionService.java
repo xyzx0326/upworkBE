@@ -65,7 +65,7 @@ public class SpeechRecognitionService {
             modelName="stt_en_conformer_ctc_xlarge.nemo";
         }
         else if (language.equals("Hindi")) {
-            modelName="stt_hi_conformer_ctc_medium.nemo";        }
+            modelName="stt_hi_conformer_ctc_medium.nemo";}
         else if (language.equals("German")) {
             modelName="stt_de_conformer_ctc_large.nemo";
         } else if (language.equals("French")) {

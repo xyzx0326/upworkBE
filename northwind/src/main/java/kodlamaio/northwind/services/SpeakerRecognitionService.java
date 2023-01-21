@@ -1,6 +1,5 @@
 package kodlamaio.northwind.services;
 
-import kodlamaio.northwind.core.utilities.responses.RecognizedSpeechResponse;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +20,7 @@ public class SpeakerRecognitionService {
                 .build();
         Response response = client.newCall(request).execute();
         String tmp=(response.body().string());
+        response.close();
 
         return tmp;
     }
@@ -38,6 +38,7 @@ public class SpeakerRecognitionService {
         Response response = client.newCall(request).execute();
 
         String tmp=(response.body().string());
+        response.close();
 
         return tmp;
     }
@@ -55,6 +56,7 @@ public class SpeakerRecognitionService {
         Response response = client.newCall(request).execute();
 
         String tmp=(response.body().string());
+        response.close();
 
         tmp=tmp.replace("\\u0131","ı");
         tmp=tmp.replace("\\u015f","ş");
@@ -78,6 +80,7 @@ public class SpeakerRecognitionService {
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .build();
         Response response = client.newCall(request).execute();
+        response.close();
 
         String tmp=(response.body().string());
 
@@ -98,6 +101,7 @@ public class SpeakerRecognitionService {
         Response response = client.newCall(request).execute();
 
         String tmp=(response.body().string());
+        response.close();
 
         tmp=tmp.replace("\\u0131","ı");
         tmp=tmp.replace("\\u015f","ş");

@@ -4,25 +4,37 @@ import okhttp3.*;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class NlpService {
 
     public void initParaphraser() throws IOException {
 
-        OkHttpClient client = new OkHttpClient().newBuilder().readTimeout(60, TimeUnit.SECONDS)
+        OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-
-        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-        RequestBody body = RequestBody.create(mediaType, "model=49.nemo");
+        MediaType mediaType = MediaType.parse("text/plain");
+        RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url("http://192.168.1.50:1010/initialize_model")
+                .url("http://localhost:1010/init")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
-                .addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .build();
         Response response = client.newCall(request).execute();
+        response.close();
+    }
+    public void initTG() throws IOException {
+
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("text/plain");
+        RequestBody body = RequestBody.create(mediaType, "");
+        Request request = new Request.Builder()
+                .url("http://localhost:1010/initTG")
+                .method("POST", body)
+                .addHeader("accept", "application/json")
+                .build();
+        Response response = client.newCall(request).execute();
+        response.close();
 
     }
 

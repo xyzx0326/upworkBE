@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @RestController
 @CrossOrigin(origins = {"https://localhost:8082","http://localhost:8082","http://localhost","https://localhost","http://localhost:4200","http://4aithings.com:8082",
-        "http://4aithings.com:4200","https://www.4aithings.com","https://optimistic-water-71022.pktriot.net"})
+        "http://4aithings.com:4200","https://www.4aithings.com","https://api.4aithings.com"})
 @RequestMapping("/api/tts")
 public class TtsController {
     private TtsService ttsService;
@@ -23,9 +23,14 @@ public class TtsController {
         this.ttsService = ttsService;
     }
 
-    @PostMapping(path = "/generateSpeech",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/initAll")
+    public void initAllModel() throws IOException {
+        ttsService.initAll();
+    }
+
+    @PostMapping(path = "/generateSpeech")
     public ResponseEntity<byte[]> generateSpeech(String sentence,
-                                                 @RequestParam("lang") String lang) throws IOException {
+                                                 String lang) throws IOException {
         byte[] t = ttsService.generateSpeech(sentence, lang);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);

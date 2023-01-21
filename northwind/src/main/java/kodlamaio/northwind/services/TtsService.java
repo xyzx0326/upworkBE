@@ -9,8 +9,26 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Locale;
 
+import static java.lang.System.in;
+
 @Service
 public class TtsService {
+
+    public void initAll() throws IOException {
+
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("text/plain");
+        RequestBody body = RequestBody.create(mediaType, "");
+        Request request = new Request.Builder()
+                .url("http://localhost:1111/initialize_all_model")
+                .method("POST", body)
+                .addHeader("accept", "application/json")
+                .build();
+        Response response = client.newCall(request).execute();
+        response.close();
+
+    }
 
 
     public byte[] generateSpeech(String sentence, String language) throws IOException {
@@ -21,7 +39,6 @@ public class TtsService {
             sentence = sentence.toLowerCase(new Locale("tr", "TR"));
             modelName="Turkish01";
         }
-
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
@@ -35,6 +52,7 @@ public class TtsService {
                 .build();
         Response response = client.newCall(request).execute();
 
+        try {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         BufferedInputStream in = new BufferedInputStream(new FileInputStream("/media/mesut/Depo1/tts.wav"));
 
@@ -47,11 +65,10 @@ public class TtsService {
         out.flush();
         byte[] wavData = out.toByteArray();
 
-//        return data
-
-//        File audioFile = new File(response.body());
-//        client.
-
         return wavData;
+        } finally {
+            response.body().close();
+            in.close();
+        }
     }
 }

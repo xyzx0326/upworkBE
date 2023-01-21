@@ -10,7 +10,7 @@ import java.io.IOException;
 
 @RestController
 @CrossOrigin(origins = {"https://localhost:8082","http://localhost:8082","http://localhost","https://localhost","http://localhost:4200",
-        "https://www.4aithings.com","https://optimistic-water-71022.pktriot.net"})
+        "https://www.4aithings.com","https://api.4aithings.com"})
 @RequestMapping("/api/nlp")
 public class NlpController {
     private NlpService nlpService;
@@ -19,6 +19,12 @@ public class NlpController {
     public NlpController(NlpService nlpService){
         super();
         this.nlpService = nlpService;
+    }
+
+    @PostMapping("/initAll")
+    public void initAllModel() throws IOException {
+        nlpService.initTG();
+        nlpService.initParaphraser();
     }
 
     @PostMapping("/runParaphraser")

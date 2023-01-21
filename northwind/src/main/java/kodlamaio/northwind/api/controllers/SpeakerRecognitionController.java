@@ -3,9 +3,9 @@ package kodlamaio.northwind.api.controllers;
 import kodlamaio.northwind.core.utilities.responses.SpeakerResponse;
 import kodlamaio.northwind.services.SpeakerRecognitionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -14,11 +14,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Random;
+import java.util.UUID;
+
 
 
 @RestController
 @CrossOrigin(origins = {"https://localhost:8082","http://localhost:8082","http://localhost","https://localhost","http://localhost:4200","http://4aithings.com:8082",
-        "http://4aithings.com:4200","https://www.4aithings.com","https://optimistic-water-71022.pktriot.net"})
+        "http://4aithings.com:4200","https://www.4aithings.com","https://api.4aithings.com"})
 @RequestMapping("/api/sv")
 public class SpeakerRecognitionController {
     private SpeakerRecognitionService speakerRecognitionService;
@@ -87,7 +89,6 @@ public class SpeakerRecognitionController {
         return ResponseEntity.status(HttpStatus.OK).body(l);
     }
 
-//    @ResponseBody
     @PostMapping("/verify")
     public ResponseEntity<String> verify(String spk, @RequestParam("file") MultipartFile file) throws IOException {
         String tmp ="/media/mesut/Depo1/o.wav";
@@ -115,32 +116,52 @@ public class SpeakerRecognitionController {
         SpeakerResponse r = new SpeakerResponse(true, l);
         return ResponseEntity.status(HttpStatus.OK).body(l);
     }
-//    @ResponseBody
     @PostMapping("/recognize")
-    public ResponseEntity<String> recognize(@RequestParam("file") MultipartFile file) throws IOException {
-        String tmp ="/media/mesut/Depo1/o.wav";
+    public ResponseEntity<String> recognize(@RequestParam("file") MultipartFile file){
+        try {
+            // validate the file
+            if (file.isEmpty()) {
+                throw new IllegalArgumentException("Invalid file provided");
+            }
 
-        //TODO buradaki preprocess kodları düzenlenecek
-        File fn = new File(tmp);
-        if(fn.exists())
-        {
-            fn.delete();
-        }
-        String ofn = file.getOriginalFilename();
-        Random rand = new Random();
-        int int_random = rand.nextInt(1000);
-        String p = "/media/mesut/Depo1/tested/"+ofn+"_"+String.valueOf(int_random);
-        Path path = Paths.get(p);
-        while (Files.exists(path)){
-            p = "/media/mesut/Depo1/tested/"+ofn+"_"+String.valueOf(int_random);
-        }
+            // create unique file name
+            String uniqueFileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            String tmp = "/media/mesut/Depo1/tmp/" + uniqueFileName;
 
-        new File(p).mkdirs();
-        File bfn = new File(p+"/"+ofn);
-        file.transferTo(bfn);
-        file.transferTo(fn);
-        String l = speakerRecognitionService.recognize(tmp);
-        SpeakerResponse r = new SpeakerResponse(true, l);
-        return ResponseEntity.status(HttpStatus.OK).body(l);
+            // create the folder
+            String p = "/media/mesut/Depo1/tmp/" + uniqueFileName;
+            Path path = Paths.get(p);
+//            if (!Files.exists(path)){
+//                new File(p).mkdirs();
+//            }
+
+            // save the file
+//            File bfn = new File(p + "/" + uniqueFileName);
+            file.transferTo(path);
+
+            // call the speaker recognition service
+            String l = speakerRecognitionService.recognize(tmp);
+//            SpeakerResponse r = new SpeakerResponse(true, l);
+            return ResponseEntity.status(HttpStatus.OK).body(l);
+        }
+        catch (IllegalArgumentException ex) {
+//            log.error("Invalid file provided: {}", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        catch (IOException ex) {
+//            log.error("Error saving file: {}", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
+
+    private boolean isValidFileType(MultipartFile file) {
+        // check file type
+        String fileType = file.getContentType();
+        if (!fileType.equals("audio/wav") || !fileType.equals("audio/wave") || !fileType.equals("audio/x-wav")) {
+            return false;
+        }
+
+        return true;
+    }
+
 }
