@@ -15,7 +15,7 @@ public class NlpService {
         MediaType mediaType = MediaType.parse("text/plain");
         RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url("http://localhost:1010/init")
+                .url("http://192.168.1.50:1010/init")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
                 .build();
@@ -29,7 +29,7 @@ public class NlpService {
         MediaType mediaType = MediaType.parse("text/plain");
         RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url("http://localhost:1010/initTG")
+                .url("http://192.168.1.50:1010/initTG")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
                 .build();
@@ -71,6 +71,5 @@ public class NlpService {
 
         return tmp;
     }
-
 
 }

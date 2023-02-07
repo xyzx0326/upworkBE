@@ -10,7 +10,9 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -64,23 +66,25 @@ public class SpeechRecognitionController {
         }
     }
 
-
-//    @RequestMapping("/")
-//    public String speechRecognitionPage() {
-//        return "speech";
-//    }
-
-//    @ResponseBody
-//    @RequestMapping(value="/init", method=POST)
     @PostMapping("/init")
     public void initModel(){
-            try {
-                speechRecognitionService.init();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
+        try {
+            speechRecognitionService.init();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
+    }
+
+    @PostMapping("/initPunct")
+    public void initPunctModel(){
+        try {
+            speechRecognitionService.initPunct();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
     @PostMapping("/initAll")
     public void initAllModel(){
@@ -98,8 +102,8 @@ public class SpeechRecognitionController {
         try {
             String ofn = file.getOriginalFilename();
 
-            tempFile = File.createTempFile(ofn, ".wav");
-            file.transferTo(tempFile);
+//            tempFile = File.createTempFile(ofn, ".wav");
+//            file.transferTo(tempFile);
 
             Random rand = new Random();
             int int_random = rand.nextInt(1000);
@@ -111,25 +115,41 @@ public class SpeechRecognitionController {
             new File(p).mkdirs();
             File bfn = new File(p + "/" + ofn);
 
-            String recognizedOutputJsonOpt = speechRecognitionService.recognize(tempFile.getAbsolutePath(), language);
+            file.transferTo(bfn);
+            String recognizedOutputJsonOpt = speechRecognitionService.recognize(bfn.getAbsolutePath(), language);
 
-            tempFile.renameTo(bfn);
-            if (tempFile.exists()) {
-                tempFile.delete();
-            }
+//            if (tempFile.exists()) {
+//                tempFile.delete();
+//            }
             // Create response object
             RecognizedSpeechResponse response = new RecognizedSpeechResponse(true, recognizedOutputJsonOpt);
             response.setRecognizedText(recognizedOutputJsonOpt);
-            message = "Successfully uploaded!";
+
             return ResponseEntity.status(HttpStatus.OK).body(recognizedOutputJsonOpt);
-//            return ResponseEntity.ok(recognizedOutputJsonOpt);
         } catch (IOException e) {
             message = "Failed to upload!";
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
-        } finally {
-            // Delete the temporary file
-            tempFile.delete();
         }
+    }
+
+    @PostMapping("/downloadVideo")
+    public   ResponseEntity<byte[]> downloadVideo(String link) {
+        String message;
+
+        try {
+            byte[] t =speechRecognitionService.downloadYoutubeVideo(link);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+//        headers.setContentType(MediaType.parseMediaType("audio/wav"));
+
+            headers.setContentLength(t.length);
+            return new ResponseEntity<byte[]>(t, headers, HttpStatus.OK);
+//            return new ResponseEntity<>(t, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            message = "Failed to upload!";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
+        }
+
     }
 
     @PostMapping("/recognizeQueue")
@@ -185,29 +205,3 @@ public class SpeechRecognitionController {
 }
 
 
-//    @PostMapping("/recognize")
-//    public RecognizedSpeechResponse speech_recognize(@RequestParam("file") MultipartFile file) {
-//        String message;
-//
-//        String tmp ="/media/mesut/Depo1/works/NeMo/tools/asr_webapp/uploads/o.wav";
-//        try {
-//            file.transferTo(new File(tmp));
-//            String recognizedOutputJsonOpt = speechRecognitionService.recognize(tmp);
-////                String recognizedText = null;
-//
-//            //            if (recognizedText == null) {
-//            //                return new RecognizedSpeechResponse(false, "Could not recognize speech");
-//            //            }
-//            RecognizedSpeechResponse r = new RecognizedSpeechResponse(true, recognizedOutputJsonOpt);
-//            r.setRecognizedText(recognizedOutputJsonOpt);
-//            return r;
-////                message = "Successfully uploaded!";
-////                return ResponseEntity.status(HttpStatus.OK).body(message);
-//
-//        } catch (IOException e) {
-//            message = "Failed to upload!";
-//            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
-////                throw new RuntimeException(e);
-//        }
-//
-//    }

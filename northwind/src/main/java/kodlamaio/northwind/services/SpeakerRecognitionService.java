@@ -115,4 +115,26 @@ public class SpeakerRecognitionService {
 
         return tmp;
     }
+
+    public String diarize(String wavPath, int numSpk) throws IOException {
+
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+        RequestBody body = RequestBody.create(mediaType, "input speech="+wavPath+"&numSpk="+String.valueOf(numSpk));
+        Request request = new Request.Builder()
+                .url("http://localhost:9081/diar")
+                .method("POST", body)
+                .addHeader("accept", "application/json")
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .build();
+        Response response = client.newCall(request).execute();
+
+
+        String tmp=(response.body().string());
+        response.close();
+
+
+        return tmp;
+    }
 }

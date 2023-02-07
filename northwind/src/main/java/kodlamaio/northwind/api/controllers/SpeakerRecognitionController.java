@@ -154,6 +154,36 @@ public class SpeakerRecognitionController {
         }
     }
 
+    @PostMapping("/diarize")
+    public ResponseEntity<String> diarize(@RequestParam("file") MultipartFile file, int numSpeakers) throws IOException {
+        try {
+            // validate the file
+            if (file.isEmpty()) {
+                throw new IllegalArgumentException("Invalid file provided");
+            }
+
+            // create unique file name
+            String uniqueFileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+
+            // create the folder
+            String p = "/media/mesut/Depo1/tmp/" + uniqueFileName;
+            Path path = Paths.get(p);
+
+            // save the file
+            file.transferTo(path);
+
+            // call the speaker recognition service
+            String l = speakerRecognitionService.diarize(p,numSpeakers);
+            return ResponseEntity.status(HttpStatus.OK).body(l);
+        }
+        catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        catch (IOException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     private boolean isValidFileType(MultipartFile file) {
         // check file type
         String fileType = file.getContentType();

@@ -21,7 +21,7 @@ public class TtsService {
         MediaType mediaType = MediaType.parse("text/plain");
         RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url("http://localhost:1111/initialize_all_model")
+                .url("http://192.168.1.50:1111/initialize_all_model")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
                 .build();
