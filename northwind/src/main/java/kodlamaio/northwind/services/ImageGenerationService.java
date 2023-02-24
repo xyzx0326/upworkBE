@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ImageGenerationService {
@@ -16,6 +17,22 @@ public class ImageGenerationService {
 //    }
 
 
+    @PostMapping("/generateArt")
+    public byte[] generateArt(String sentence) throws IOException {
+
+        OkHttpClient client = new OkHttpClient().newBuilder().readTimeout(180, TimeUnit.SECONDS)
+                .build();
+        Request request = new Request.Builder()
+                .url("http://imagegen:8000/runIGArt/"+sentence)
+                .method("GET", null)
+                .build();
+        Response response = client.newCall(request).execute();
+
+        byte[] imageData = response.body().bytes();
+//        String tmp = null;
+//        tmp = (response.body().string());
+        return imageData;
+    }
 
     @PostMapping("/generateImage")
     public String generateImage(String sentence) throws IOException {
@@ -32,10 +49,12 @@ public class ImageGenerationService {
                 .build();
         Response response = client.newCall(request).execute();
 
+
         String tmp = null;
         tmp = (response.body().string());
         return tmp;
     }
+
 
     @PostMapping("/editImage")
     public String editImage(String sentence) throws IOException {
@@ -63,13 +82,13 @@ public class ImageGenerationService {
     }
 
     @PostMapping("/variateImage")
-    public String variateImage(String sentence) throws IOException {
+    public String variateImage(String pathInputImage) throws IOException {
 
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         MediaType mediaType = MediaType.parse("text/plain");
         RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                .addFormDataPart("image","@otter.png")
+                .addFormDataPart("image","@"+pathInputImage)
                 .addFormDataPart("n","2")
                 .addFormDataPart("size","256x256")
                 .build();

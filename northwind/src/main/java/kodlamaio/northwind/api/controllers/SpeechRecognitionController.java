@@ -28,8 +28,8 @@ import java.util.Random;
 
 
 @RestController
-@CrossOrigin(origins = {"https://localhost:8082","http://localhost:8082","http://localhost","https://localhost","http://localhost:4200",
-        "https://www.4aithings.com","https://api.4aithings.com"})
+@CrossOrigin(origins = {"https://192.168.1.50","http://192.168.1.50","http://localhost","https://localhost","http://localhost:4200",
+        "https://www.4aithings.com","http://www.4aithings.com","https://api.4aithings.com"})
 @RequestMapping("/api/stt")
 public class SpeechRecognitionController {
 
@@ -95,6 +95,33 @@ public class SpeechRecognitionController {
         }
     }
 
+    @PostMapping("/detectLanguage")
+    public ResponseEntity<String> detectLang(MultipartFile file){
+        String message;
+        File tempFile = null;
+        try {
+            String ofn = file.getOriginalFilename();
+
+            Random rand = new Random();
+            int int_random = rand.nextInt(1000);
+            String p = "/media/mesut/Depo1/tested/" + ofn + "_" + String.valueOf(int_random);
+            Path path = Paths.get(p);
+            while (Files.exists(path)) {
+                p = "/media/mesut/Depo1/tested/" + ofn + "_" + String.valueOf(int_random);
+            }
+            new File(p).mkdirs();
+            File bfn = new File(p + "/" + ofn);
+
+            file.transferTo(bfn);
+            String recognizedOutputJsonOpt = speechRecognitionService.detectLang(bfn.getAbsolutePath());
+            return ResponseEntity.status(HttpStatus.OK).body(recognizedOutputJsonOpt);
+
+        } catch (IOException e) {
+            message = "Failed to upload!";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
+        }
+
+    }
     @PostMapping("/recognize")
     public ResponseEntity<String> speech_recognize(MultipartFile file, String language) {
         String message;
@@ -123,6 +150,8 @@ public class SpeechRecognitionController {
 //            }
             // Create response object
             RecognizedSpeechResponse response = new RecognizedSpeechResponse(true, recognizedOutputJsonOpt);
+
+
             response.setRecognizedText(recognizedOutputJsonOpt);
 
             return ResponseEntity.status(HttpStatus.OK).body(recognizedOutputJsonOpt);
@@ -190,6 +219,20 @@ public class SpeechRecognitionController {
         }
     }
 
+    @PostMapping("/runPunc")
+    public ResponseEntity<String> runPunc(String sentence){
+        String message;
+        File tempFile = null;
+        try {
+            String recognizedOutputJsonOpt = speechRecognitionService.runPunc(sentence);
+            return ResponseEntity.status(HttpStatus.OK).body(recognizedOutputJsonOpt);
+
+        } catch (IOException e) {
+            message = "Failed to upload!";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
+        }
+
+    }
     @GetMapping("/getResponse")
     public ResponseEntity<String> getResp() {
         String recognizedOutputJsonOpt = (String) rabbitTemplate.receiveAndConvert("recognized-text-queue");

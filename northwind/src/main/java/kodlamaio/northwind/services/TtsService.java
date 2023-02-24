@@ -21,7 +21,7 @@ public class TtsService {
         MediaType mediaType = MediaType.parse("text/plain");
         RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url("http://192.168.1.50:1111/initialize_all_model")
+                .url("http://images_tts_1:1111/initialize_all_model")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
                 .build();
@@ -45,7 +45,7 @@ public class TtsService {
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         RequestBody body = RequestBody.create(mediaType, "ttsModel="+modelName+"&sentence="+sentence);
         Request request = new Request.Builder()
-                .url("http://192.168.1.50:1111/synthesize")
+                .url("http://images_tts_1:1111/synthesize")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")

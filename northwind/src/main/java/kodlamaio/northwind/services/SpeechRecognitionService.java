@@ -23,7 +23,7 @@ public class SpeechRecognitionService {
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         RequestBody body = RequestBody.create(mediaType, "model=49.nemo");
         Request request = new Request.Builder()
-                .url("http://192.168.1.50:9080/initialize_model")
+                .url("http://images_asr_1:9080/initialize_model")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
@@ -35,16 +35,14 @@ public class SpeechRecognitionService {
 
     public void initPunct() throws IOException {
 
-        OkHttpClient client = new OkHttpClient().newBuilder().readTimeout(60, TimeUnit.SECONDS)
+        OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-
-        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-        RequestBody body = RequestBody.create(mediaType, "model=49.nemo");
+        MediaType mediaType = MediaType.parse("text/plain");
+        RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url("http://192.168.1.50:9080/initialize_model")
+                .url("http://images_punctuator_1:9079/initialize_punc")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
-                .addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .build();
         Response response = client.newCall(request).execute();
         response.close();
@@ -71,7 +69,7 @@ public class SpeechRecognitionService {
             String respModel="model="+modelSTT;
             RequestBody body = RequestBody.create(mediaType, respModel);
             Request request = new Request.Builder()
-                    .url("http://192.168.1.50:9080/initialize_model")
+                    .url("http://images_asr_1:9080/initialize_model")
                     .method("POST", body)
                     .addHeader("accept", "application/json")
                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
@@ -81,14 +79,56 @@ public class SpeechRecognitionService {
         }
     }
 
+
+    public String detectLang(String wavPath) throws IOException {
+
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+        RequestBody body = RequestBody.create(mediaType, "inputText="+wavPath);
+        Request request = new Request.Builder()
+                .url("http://images_asrMulti_1:7070/detectLang")
+                .method("POST", body)
+                .addHeader("accept", "application/json")
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .build();
+        Response response = client.newCall(request).execute();
+        response.close();
+
+        return response.body().string();
+
+    }
+
+    public String runPunc(String sentence) throws IOException {
+
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+        RequestBody body = RequestBody.create(mediaType, "inputText="+sentence);
+        Request request = new Request.Builder()
+                .url("http://172.17.0.2:9079/punctuate")
+                .method("POST", body)
+                .addHeader("accept", "application/json")
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .build();
+        Response response = client.newCall(request).execute();
+        response.close();
+
+        return response.body().string();
+
+    }
+
+
     public byte[] downloadYoutubeVideo(String link) throws IOException {
 
         OkHttpClient client = new OkHttpClient().newBuilder().readTimeout(180, TimeUnit.SECONDS)
                 .build();
+
+
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         RequestBody body = RequestBody.create(mediaType, "inputText="+link);
         Request request = new Request.Builder()
-                .url("http://192.168.1.50:7070/downloadYoutubeVideo")
+                .url("http://images_asrMulti_1:7070/downloadYoutubeVideo")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
@@ -124,20 +164,9 @@ public class SpeechRecognitionService {
 
         return mp4Data;
 
-//        String tmp = null;
-//        tmp = (response.body().string());
-//        tmp = tmp.replace("\\u0131", "ı");
-//        tmp = tmp.replace("\\u015f", "ş");
-//        tmp = tmp.replace("\\u00e7", "ç");
-//        tmp = tmp.replace("\\u011f", "ğ");
-//        tmp = tmp.replace("\\u00fc", "ü");
-//        tmp = tmp.replace("\\u00f6", "ö");
-//        return tmp;
     }
     public String recognize(String wavPath, String language) throws IOException {
         String modelName = null;
-
-
 
         if(language.equals("Arabic") ){
             Locale trLocale = new Locale("ar", "AE");
@@ -147,7 +176,7 @@ public class SpeechRecognitionService {
             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
             RequestBody body = RequestBody.create(mediaType, "language="+language+"&inputText="+wavPath);
             Request request = new Request.Builder()
-                    .url("http://192.168.1.50:7070/transcribeSeg")
+                    .url("http://images_asrMulti_1:7070/transcribeSeg")
                     .method("POST", body)
                     .addHeader("accept", "application/json")
                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
@@ -156,16 +185,25 @@ public class SpeechRecognitionService {
 
             try (Response response = client.newCall(request).execute()) {
                 tmp = (response.body().string());
-//                if(language.equals("Turkish") ){
-//                    tmp = tmp.replace("\\u0131", "ı");
-//                    tmp = tmp.replace("\\u015f", "ş");
-//                    tmp = tmp.replace("\\u00e7", "ç");
-//                    tmp = tmp.replace("\\u011f", "ğ");
-//                    tmp = tmp.replace("\\u00fc", "ü");
-//                    tmp = tmp.replace("\\u00f6", "ö");
-//                }
+
                 response.body().close();
             }
+
+//            String tmp2 = null;
+//
+//            OkHttpClient client2 = new OkHttpClient().newBuilder()
+//                    .build();
+//            MediaType mediaType2 = MediaType.parse("application/x-www-form-urlencoded");
+//            RequestBody body2 = RequestBody.create(mediaType2, "inputText="+tmp);
+//            Request request2 = new Request.Builder()
+//                    .url("http://images_punctuator_1:9079/punctuate")
+//                    .method("POST", body2)
+//                    .addHeader("accept", "application/json")
+//                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
+//                    .build();
+//            Response response = client2.newCall(request2).execute();
+//            response.close();
+
             return tmp;
         }
         else if( language.equals("Turkish") || language.equals("English") || language.equals("Hindi") || language.equals("German") || language.equals("French") || language.equals("Russian") || language.equals("Spanish")){
@@ -207,7 +245,7 @@ public class SpeechRecognitionService {
             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
             RequestBody body = RequestBody.create(mediaType, cont);
             Request request = new Request.Builder()
-                    .url("http://192.168.1.50:9080/transcribeSeg")
+                    .url("http://asr:9080/transcribeSeg")
                     .method("POST", body)
                     .addHeader("accept", "application/json")
                     .addHeader("Content-Type", "application/x-www-form-urlencoded")
@@ -216,12 +254,26 @@ public class SpeechRecognitionService {
             String tmp = null;
             try (Response response = client.newCall(request).execute()) {
                 tmp = (response.body().string());
-//                tmp = tmp.replace("\\u0131", "ı");
-//                tmp = tmp.replace("\\u015f", "ş");
-//                tmp = tmp.replace("\\u00e7", "ç");
-//                tmp = tmp.replace("\\u011f", "ğ");
-//                tmp = tmp.replace("\\u00fc", "ü");
-//                tmp = tmp.replace("\\u00f6", "ö");
+                if(language.equals("Turkish") ){
+                    tmp = tmp.replace("\\u0131", "ı");
+                    tmp = tmp.replace("\\u015f", "ş");
+                    tmp = tmp.replace("\\u00e7", "ç");
+                    tmp = tmp.replace("\\u011f", "ğ");
+                    tmp = tmp.replace("\\u00fc", "ü");
+                    tmp = tmp.replace("\\u00f6", "ö");
+                    tmp = tmp.replace("\\u0130", "İ");
+                    tmp = tmp.replace("\\u015e", "Ş");
+                    tmp = tmp.replace("\\u00c7", "Ç");
+                    tmp = tmp.replace("\\u011e", "Ğ");
+                    tmp = tmp.replace("\\u00dc", "Ü");
+                    tmp = tmp.replace("\\u00d6", "Ö");
+//                    tmp = tmp.replace("\"", "");
+
+                    tmp = tmp.replace("\\n", "");
+                    tmp = tmp.replace("\\", "");
+                    tmp = tmp.replace("\"\"", "\"");
+
+                }
                 response.body().close();
             }
             return tmp;

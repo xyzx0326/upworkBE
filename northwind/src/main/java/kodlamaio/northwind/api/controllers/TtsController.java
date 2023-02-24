@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @RestController
 @CrossOrigin(origins = {"https://localhost:8082","http://localhost:8082","http://localhost","https://localhost","http://localhost:4200","http://4aithings.com:8082",
-        "http://4aithings.com:4200","https://www.4aithings.com","https://api.4aithings.com"})
+        "http://4aithings.com:4200","https://www.4aithings.com","http://www.4aithings.com","https://api.4aithings.com"})
 @RequestMapping("/api/tts")
 public class TtsController {
     private TtsService ttsService;

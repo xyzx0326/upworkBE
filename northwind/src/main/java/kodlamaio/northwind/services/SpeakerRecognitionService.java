@@ -13,7 +13,7 @@ public class SpeakerRecognitionService {
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         RequestBody body = RequestBody.create(mediaType, "speaker name="+spk+"&input speech="+wavPath);
         Request request = new Request.Builder()
-                .url("http://192.168.1.50:9081/extractEmb")
+                .url("http://images_spk_1:9081/extractEmb")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
@@ -31,7 +31,7 @@ public class SpeakerRecognitionService {
         MediaType mediaType = MediaType.parse("text/plain");
         RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url("http://192.168.1.50:9081/initialize_model")
+                .url("http://images_spk_1:9081/initialize_model")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
                 .build();
@@ -49,7 +49,7 @@ public class SpeakerRecognitionService {
         MediaType mediaType = MediaType.parse("text/plain");
         RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url("http://192.168.1.50:9081/getEnrolledSpeakers")
+                .url("http://images_spk_1:9081/getEnrolledSpeakers")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
                 .build();
@@ -74,7 +74,7 @@ public class SpeakerRecognitionService {
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         RequestBody body = RequestBody.create(mediaType, "speaker name="+spk+"&input speech="+wavPath);
         Request request = new Request.Builder()
-                .url("http://192.168.1.50:9081/verify")
+                .url("http://images_spk_1:9081/verify")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
@@ -93,7 +93,7 @@ public class SpeakerRecognitionService {
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
         RequestBody body = RequestBody.create(mediaType, "input speech="+wavPath);
         Request request = new Request.Builder()
-                .url("http://192.168.1.50:9081/recognize")
+                .url("http://images_spk_1:9081/recognize")
                 .method("POST", body)
                 .addHeader("accept", "application/json")
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
