@@ -10,6 +10,12 @@ import java.io.Serializable;
 public class RecognitionMessage implements Serializable {
     private String filepath;
     private String language;
+
+    private String userId;
+
+    private int processId;
+
+
 //    private Process process;
 
 }
