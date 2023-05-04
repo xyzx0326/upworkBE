@@ -20,17 +20,33 @@ services:
     # after running "docker-compose down && docker-compose up --build".
     volumes:
       - postgres-data-dev:/var/lib/postgresql/data
+  mq:
+    image: 'rabbitmq:3-management'
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: 'guest'
+      RABBITMQ_DEFAULT_PASS: 'guest'
+      RABBITMQ_DEFAULT_VHOST: 'ses'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    expose:
+      - 5672
+    networks:
+      - db-net
   app:
     build: .
     # image: name-of-your-app  # optional
     environment:
       SPRING_DATASOURCE_URL: 'jdbc:postgresql://db:5432/ses'
+      MQ_HOST: 'mq'
     ports:
-      - '8080:8080'
+      - '8080:8085'
     networks:
       - db-net
     depends_on:
       - db
+      - mq
 networks:
   db-net:
     driver: bridge
