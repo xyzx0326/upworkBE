@@ -1,5 +1,8 @@
 package kodlamaio.northwind.constant;
 
+/**
+ * Rabbitmq constant
+ */
 public class MqConstant {
 
     public static final String SPEECH_EXCHANGE = "ses.speech";

@@ -30,14 +30,18 @@ public class SpeechAllLanguageQueue {
 
     @SneakyThrows
     @RabbitHandler
-    @RabbitListener(queues = MqConstant.SPEECH_ALL_QUEUE, ackMode = "MANUAL")
+    @RabbitListener(queues = MqConstant.SPEECH_ALL_QUEUE)
     public void handler(Message message, Channel channel) {
         log.info("mq receive message: {}", message.toString());
         TmpFile file = JsonUtils.toObject(new String(message.getBody()), TmpFile.class);
-        String recognize = speechRecognitionService.recognize(file);
-        log.info("recognize: {}", recognize);
-        channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
-        //        channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
+        try {
+            String recognize = speechRecognitionService.recognize(file);
+            log.info("recognize: {}", recognize);
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (Exception e) {
+            log.error("recognize error", e);
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
+        }
     }
 
 }

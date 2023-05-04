@@ -15,11 +15,19 @@ import org.springframework.context.annotation.Configuration;
 @EnableRabbit
 public class RabbitMqConfig {
 
+    /**
+     * default rabbitmq config
+     *
+     * @param configurer
+     * @param connectionFactory
+     * @return
+     */
     @Bean
     public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(
             SimpleRabbitListenerContainerFactoryConfigurer configurer, ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setMessageConverter(new Jackson2JsonMessageConverter());
+        // enable manual ack
         factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);
         // consumer number
         factory.setConcurrentConsumers(2);

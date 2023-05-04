@@ -32,7 +32,7 @@ public class SpeechRecognitionService {
     private static final Map<String, String> result = new ConcurrentHashMap<>();
 
 
-    public String receive(MultipartFile file, String language) throws IOException {
+    public String receive(MultipartFile file, String language) {
         // A simple way to process the file, may not be the best way
         // create tmp file
         UUID uuid = UUID.randomUUID();
@@ -42,7 +42,11 @@ public class SpeechRecognitionService {
         }
 
         File dest = new File(applicationConfig.getTmpDir() + "/" + uuid);
-        Files.copy(file.getInputStream(), dest.toPath());
+        try {
+            Files.copy(file.getInputStream(), dest.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store file", e);
+        }
         // send message to queue
         // TODO: save file info to db
         TmpFile message = new TmpFile();
