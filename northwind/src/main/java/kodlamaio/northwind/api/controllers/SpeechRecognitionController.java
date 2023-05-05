@@ -21,12 +21,13 @@ public class SpeechRecognitionController {
     }
 
     /**
-     * temporary read result
+     * temporary read result, only string result
+     * ps: three result fetch method can merge to one if you want
      *
      * @param id tmp file id
      * @return result
      */
-    @GetMapping("/result/{id}")
+    @GetMapping("/recognize/{id}")
     public String result(@PathVariable String id) {
         return speechRecognitionService.result(id);
     }

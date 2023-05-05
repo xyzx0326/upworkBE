@@ -63,4 +63,35 @@ public class RabbitMqConfig {
                 .with(MqConstant.SPEECH_EN_ROUTING_KEY);
     }
 
+    @Bean
+    public DirectExchange speakerRecognitionExchange() {
+        return new DirectExchange(MqConstant.SPEAKER_RECOGNITION_EXCHANGE, true, false);
+    }
+
+    @Bean
+    public Queue speakerRecognitionQueue() {
+        return new Queue(MqConstant.SPEAKER_RECOGNITION_QUEUE, true, false, false);
+    }
+
+    @Bean
+    public Binding speakerRecognitionBinding() {
+        return BindingBuilder.bind(speakerRecognitionQueue()).to(speakerRecognitionExchange()).withQueueName();
+    }
+
+    @Bean
+    public DirectExchange speakerEnrollExchange() {
+        return new DirectExchange(MqConstant.SPEAKER_ENROLL_EXCHANGE, true, false);
+    }
+
+    @Bean
+    public Queue speakerEnrollQueue() {
+        return new Queue(MqConstant.SPEAKER_ENROLL_QUEUE, true, false, false);
+    }
+
+    @Bean
+    public Binding speakerEnrollBinding() {
+        return BindingBuilder.bind(speakerEnrollQueue()).to(speakerEnrollExchange())
+                .withQueueName();
+    }
+
 }

@@ -15,5 +15,12 @@ public class MqConstant {
 
     public static final String SPEECH_EN_ROUTING_KEY = "english";
 
+    public static final String SPEAKER_ENROLL_EXCHANGE = "ses.speaker.enroll";
+
+    public static final String SPEAKER_ENROLL_QUEUE = "ses.speaker.enroll.queue";
+
+    public static final String SPEAKER_RECOGNITION_EXCHANGE = "ses.speaker.recognition";
+
+    public static final String SPEAKER_RECOGNITION_QUEUE = "ses.speaker.recognition.queue";
 
 }
